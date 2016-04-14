@@ -24,7 +24,7 @@ app.post('/sms', (req, res) => {
 
   if(gameboyButtons.indexOf(message.toLowerCase()) > -1) {
     twiml.message('Thanks for playing Pokemon with me :)');
-    client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
+    client.send(message, 0, message.length, PORT, HOST, (err, bytes) => {
         if (err) console.log(err);
         console.log('UDP message sent to ' + HOST +':'+ PORT);
     });
