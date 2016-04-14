@@ -1,10 +1,13 @@
 "use strict";
 
-const fs = require('fs');
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const twilio = require('twilio');
+
+const PORT = 53474;
+const HOST = '127.0.0.1';
+const dgram = require('dgram');
+const client = dgram.createSocket('udp4');
 
 const app = express();
 const gameboyButtons = ['a', 'b', 'left', 'right', 'up', 'down', 'start', 'select'];
@@ -21,7 +24,10 @@ app.post('/sms', (req, res) => {
 
   if(gameboyButtons.indexOf(message.toLowerCase()) > -1) {
     twiml.message('Thanks for playing Pokemon with me :)');
-    fs.writeFileSync('button.txt', message, 'utf8');
+    client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
+        if (err) console.log(err);
+        console.log('UDP message sent to ' + HOST +':'+ PORT);
+    });
   } else {
     twiml.message('Please send a valid Gameboy button.');
   }

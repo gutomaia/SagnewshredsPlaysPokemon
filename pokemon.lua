@@ -1,27 +1,11 @@
-function read_file(filename)
-    local input = io.open(filename, 'r')
-    if input ~= nil then
-        io.input(input)
-        input_content = io.read()
-        io.close(input)
+pcall(require, "luarocks.require")
+local socket = require "socket"
 
-        return input_content
-    end
+local INPUT_PORT = 53474
 
-    return nil
-end
-
-function file_exists(filename)
-    f = io.open(filename, 'r')
-
-    if f ~= nil then
-        io.close(f)
-        return true
-    else
-        io.close(f)
-        return false
-    end
-end
+local incomming = socket.udp()
+incomming:setsockname("*", 53474)
+incomming:settimeout(0)
 
 function press_button(button)
     input_table = {}
@@ -35,21 +19,19 @@ function has_value (tab, val)
             return true
         end
     end
-
     return false
 end
 
 gb_buttons = {'A', 'B', 'up', 'down', 'left', 'right', 'start', 'select'}
 
 while true do
-    button = read_file('button.txt')
+    button, ip, port = incomming:receivefrom()
     if button ~= nil then
         if has_value(gb_buttons, button) then
             press_button(button)
             emu.message('Pressing: ' .. button)
-            os.remove('button.txt')
         end
     end
-
+    socket.sleep(0.01)
     emu.frameadvance()
 end
